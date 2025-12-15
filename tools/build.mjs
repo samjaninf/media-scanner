@@ -15,7 +15,7 @@ mkdirp.sync('deploy')
 // Run pkg
 const filename = platform === 'win32' ? 'deploy/scanner.exe' : 'deploy/scanner'
 try {
-	cp.execSync(`pkg -t node18-${platform} dist/index.js -o ${filename}`)
+	cp.execSync(`pkg -t node24-${platform} dist/index.js -o ${filename}`)
 } catch (error) {
 	console.log(error.stdout.toString())
 	// eslint-disable-next-line no-process-exit
