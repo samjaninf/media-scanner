@@ -1,16 +1,10 @@
-import path from 'path'
-import os from 'os'
-import { mkdirp } from 'mkdirp'
-import cp from 'child_process'
-import fs from 'fs'
-import util from 'util'
+import path from 'node:path'
+import os from 'node:os'
+import cp from 'node:child_process'
+import fs from 'node:fs/promises'
 import moment from 'moment'
-import { MediaDocument, PouchDBMediaDocument } from './db'
-import { getId } from './util'
-
-const statAsync = util.promisify(fs.stat)
-const unlinkAsync = util.promisify(fs.unlink)
-const readFileAsync = util.promisify(fs.readFile)
+import { MediaDocument, PouchDBMediaDocument } from './db.js'
+import { getId } from './util.js'
 
 export async function generateThumb(config: Record<string, any>, doc: PouchDBMediaDocument): Promise<void> {
 	const tmpPath = path.join(os.tmpdir(), Math.random().toString(16)) + '.png'
@@ -28,12 +22,12 @@ export async function generateThumb(config: Record<string, any>, doc: PouchDBMed
 		tmpPath,
 	]
 
-	await mkdirp(path.dirname(tmpPath))
+	await fs.mkdir(path.dirname(tmpPath), { recursive: true })
 	await new Promise<void>((resolve, reject) => {
 		cp.exec(args.join(' '), (err) => (err ? reject(err) : resolve()))
 	})
 
-	const thumbStat = await statAsync(tmpPath)
+	const thumbStat = await fs.stat(tmpPath)
 	doc.thumbSize = thumbStat.size
 	doc.thumbTime = thumbStat.mtime.getTime()
 	doc.tinf =
@@ -47,10 +41,10 @@ export async function generateThumb(config: Record<string, any>, doc: PouchDBMed
 	doc._attachments = {
 		'thumb.png': {
 			content_type: 'image/png',
-			data: await readFileAsync(tmpPath),
+			data: await fs.readFile(tmpPath),
 		},
 	}
-	await unlinkAsync(tmpPath)
+	await fs.unlink(tmpPath)
 }
 
 export async function generateInfo(config: Record<string, any>, doc: PouchDBMediaDocument): Promise<void> {

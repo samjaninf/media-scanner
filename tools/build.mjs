@@ -1,8 +1,9 @@
-import * as fs from 'fs/promises'
+import * as fs from 'node:fs/promises'
 import { rimraf } from 'rimraf'
-import cp from 'child_process'
+import cp from 'node:child_process'
 import { zip } from 'zip-a-folder'
-import { mkdirp } from 'mkdirp'
+import { build } from 'esbuild'
+// import pkg from '@yao-pkg/pkg'
 
 const platform = process.argv[2] || process.platform
 const arch = process.argv[3] || process.arch
@@ -10,17 +11,17 @@ const arch = process.argv[3] || process.arch
 console.log(`Building for ${platform}-${arch}`)
 
 await rimraf('deploy')
-mkdirp.sync('deploy')
+await fs.mkdir('deploy', { recursive: true })
 
-// Run pkg
-const filename = platform === 'win32' ? 'deploy/scanner.exe' : 'deploy/scanner'
-try {
-	cp.execSync(`pkg -t node24-${platform} dist/index.js -o ${filename}`)
-} catch (error) {
-	console.log(error.stdout.toString())
-	// eslint-disable-next-line no-process-exit
-	process.exit(1)
-}
+await build({
+	entryPoints: ['src/index.ts'],
+	bundle: true,
+	minify: false,
+	platform: 'node',
+	target: ['node24'],
+	external: [],
+	outfile: 'deploy/scanner.js',
+})
 
 // Copy leveldown
 await fs.mkdir(`deploy/prebuilds`, { recursive: true })
@@ -28,13 +29,46 @@ await fs.cp(`./node_modules/leveldown/prebuilds/${platform}-${arch}`, `deploy/pr
 	recursive: true,
 })
 
+const unpacked = !!process.env.UNPACKED
+if (!unpacked) {
+	await fs.writeFile(
+		'deploy/package.json',
+		JSON.stringify({
+			name: 'casparcg-scanner',
+			version: '0.0.0',
+			description: 'CasparCG Media Scanner',
+			main: 'scanner.js',
+			bin: {
+				scanner: './scanner.js',
+			},
+			pkg: {
+				assets: 'prebuilds/**/*',
+			},
+		})
+	)
+
+	// Run pkg
+	const filename = platform === 'win32' ? 'scanner.exe' : 'scanner'
+	try {
+		cp.execSync(`pkg -t node24-${platform} . -o ${filename}`, { cwd: './deploy' })
+	} catch (error) {
+		console.log(error.stdout.toString())
+		// eslint-disable-next-line n/no-process-exit
+		process.exit(1)
+	}
+
+	await rimraf(['deploy/package.json', 'deploy/scanner.js', 'deploy/prebuilds'])
+}
+
 // Create zip
 const packageJson = await fs.readFile('./package.json')
 const pkg = JSON.parse(packageJson)
 const version = pkg.version
 
 const packageName = 'casparcg-scanner'
-const zipFileName = `${packageName}-v${version}-${platform}-${arch}.zip`
+const zipFileName = unpacked
+	? `${packageName}-v${version}-unpacked-${platform}-${arch}.zip`
+	: `${packageName}-v${version}-${platform}-${arch}.zip`
 
 const err = await zip('./deploy', `./${zipFileName}`)
 if (err) {

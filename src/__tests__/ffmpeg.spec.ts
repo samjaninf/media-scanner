@@ -1,9 +1,10 @@
-import { generateInfo } from '../ffmpeg'
-import { PouchDBMediaDocument } from '../db'
+import { generateInfo } from '../ffmpeg.js'
+import { PouchDBMediaDocument } from '../db.js'
 import path from 'path'
 import moment from 'moment'
+import { createRequire } from 'node:module'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+const require = createRequire(import.meta.url)
 const targetVersions = require('./ffmpegReleases.json')
 
 const testMediaPath = path.join(__dirname, 'samples')

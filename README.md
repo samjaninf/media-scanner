@@ -39,26 +39,6 @@ These endpoints are exposed by the AMCP protocol in CasparCG Server. This means 
 - `/media/info/<name>` - Gets the json enhanced metadata for the specified media file
 - `/media/thumbnail/<name>` - Gets the thumbnail for a media file
 
-### Changes
-
-A stream of changes can be accessed with the following. [Full docs](https://pouchdb.com/api.html#changes)
-
-```
-const PouchDB = require('pouchdb-node')
-const db = new PouchDB('http://localhost:8000/db/_media')
-
-// Listen for changes
-db.changes({
-    since: 'now',
-    include_docs: true,
-    live: true
-}).on('change', function (changes) {
-    console.log(changes)
-}).on('error', function (err) {
-    // handle errors
-});
-```
-
 # For Developers
 
 ## Running in development

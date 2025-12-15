@@ -18,7 +18,7 @@ async function pathExists(path) {
 	try {
 		await fs.stat(path)
 		return true
-	} catch (e) {
+	} catch (_e) {
 		return false
 	}
 }
@@ -36,7 +36,6 @@ if (platformVersions) {
 			console.log(`Fetching ${version.url}`)
 			// Download it
 
-			// eslint-disable-next-line no-undef
 			const response = await fetch(version.url)
 			if (!response.ok) throw new Error(`unexpected response ${response.statusText}`)
 			await streamPipeline(response.body, createWriteStream(tmpPath))

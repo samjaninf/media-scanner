@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import express from 'express'
-import pinoHttp from 'pino-http'
+import { pinoHttp } from 'pino-http'
 import cors from 'cors'
 import recursiveReadDir from 'recursive-readdir'
-import { getId, getGDDScriptElement, extractGDDJSON } from './util'
+import { getId, getGDDScriptElement, extractGDDJSON } from './util.js'
 import { Logger } from 'pino'
-import { MediaDatabase } from './db'
+import { MediaDatabase } from './db.js'
 
 const wrap = (fn: express.Handler) => (req: express.Request, res: express.Response, next: express.NextFunction) => {
-	Promise.resolve(fn(req, res, next)).catch(next)
+	void Promise.resolve(fn(req, res, next)).catch(next)
 }
 
 export default function (logger: Logger, db: MediaDatabase, config: Record<string, any>): express.Application {
@@ -234,7 +233,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 			}
 
 			res.set('content-type', 'text/plain')
-			return res.send(`201 THUMBNAIL RETRIEVE OK\r\n${thumbAttachment.data}\r\n`)
+			return res.send(`201 THUMBNAIL RETRIEVE OK\r\n${thumbAttachment.data as string}\r\n`)
 		})
 	)
 

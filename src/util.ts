@@ -1,5 +1,5 @@
-import path from 'path'
-import fs from 'fs/promises'
+import path from 'node:path'
+import fs from 'node:fs/promises'
 import cheerio, { Cheerio, Element } from 'cheerio'
 
 export function getId(fileDir: string, filePath: string): string {
@@ -28,7 +28,7 @@ export async function extractGDDJSON(filePath: string, scriptElem: Cheerio<Eleme
 		const externalGDDPath = path.resolve(path.dirname(filePath), src)
 		try {
 			gddContent = await fs.readFile(externalGDDPath, { encoding: 'utf-8' })
-		} catch (error) {
+		} catch (_error) {
 			throw new Error(`Failed to read external GDD "${src}" from "${filePath}", does the file exist?`)
 		}
 	} else {
@@ -37,7 +37,7 @@ export async function extractGDDJSON(filePath: string, scriptElem: Cheerio<Eleme
 
 	try {
 		return JSON.parse(gddContent)
-	} catch (error) {
+	} catch (_error) {
 		throw new Error(`Failed to parse GDD from "${filePath}", is it valid JSON?`)
 	}
 }

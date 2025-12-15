@@ -1,18 +1,16 @@
 import { Observable } from 'rxjs'
 import { concatMap } from 'rxjs/operators'
-import util from 'util'
 import chokidar from 'chokidar'
-import fs from 'fs'
-import path from 'path'
-import { getId } from './util'
+import fs from 'node:fs/promises'
+import type fs0 from 'node:fs'
+import path from 'node:path'
+import { getId } from './util.js'
 import { Logger } from 'pino'
-import { MediaDatabase, PouchDBMediaDocument } from './db'
-import { generateInfo, generateThumb } from './ffmpeg'
-
-const statAsync = util.promisify(fs.stat)
+import { MediaDatabase, PouchDBMediaDocument } from './db.js'
+import { generateInfo, generateThumb } from './ffmpeg.js'
 
 export default function (logger: Logger, db: MediaDatabase, config: Record<string, any>): void {
-	new Observable<[path: string, stat: fs.Stats | undefined]>((o) => {
+	new Observable<[path: string, stat: fs0.Stats | undefined]>((o) => {
 		const watcher = chokidar
 			.watch(
 				config.scanner.paths,
@@ -62,7 +60,6 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 		const limit = 256
 		let startkey
 
-		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const deleted: Array<any> = []
 
@@ -78,11 +75,11 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 						const mediaPath = path.normalize(doc.mediaPath)
 						if (mediaPath.startsWith(mediaFolder)) {
 							try {
-								const stat = await statAsync(doc.mediaPath)
+								const stat = await fs.stat(doc.mediaPath)
 								if (stat.isFile()) {
 									return
 								}
-							} catch (e) {
+							} catch (_e) {
 								// File not found
 							}
 						}
@@ -110,7 +107,7 @@ export default function (logger: Logger, db: MediaDatabase, config: Record<strin
 	}
 	void cleanDeleted()
 
-	async function scanFile(mediaPath: string, mediaId: string, mediaStat: fs.Stats) {
+	async function scanFile(mediaPath: string, mediaId: string, mediaStat: fs0.Stats) {
 		if (!mediaId || mediaStat.isDirectory()) {
 			return
 		}

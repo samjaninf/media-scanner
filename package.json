@@ -4,6 +4,7 @@
 	"private": true,
 	"description": "",
 	"license": "LGPL-3.0",
+	"type": "module",
 	"main": "dist/index.js",
 	"repository": {
 		"type": "git",
@@ -13,8 +14,7 @@
 	"scripts": {
 		"postinstall": "husky",
 		"dev": "tsx --watch ./src/index.ts",
-		"build": "run build:ts && node tools/build.mjs",
-		"build:ts": "rimraf dist && tsc -b tsconfig.build.json",
+		"build": "node tools/build.mjs",
 		"build-linux-arm64": "run build linux arm64",
 		"build-linux-x64": "run build linux x64",
 		"build-win32-x64": "run build win32 x64",
@@ -36,7 +36,6 @@
 		"chokidar": "^3.6.0",
 		"cors": "^2.8.5",
 		"express": "^5.2.1",
-		"mkdirp": "^3.0.1",
 		"moment": "^2.30.1",
 		"nconf": "^0.13.0",
 		"pino": "^10.1.0",
@@ -47,7 +46,7 @@
 		"xml2js": "^0.6.2"
 	},
 	"devDependencies": {
-		"@sofie-automation/code-standard-preset": "2.5.2",
+		"@sofie-automation/code-standard-preset": "3.2.0",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/jest": "^30.0.0",
@@ -57,14 +56,17 @@
 		"@types/recursive-readdir": "^2.2.4",
 		"@types/xml2js": "^0.4.14",
 		"@yao-pkg/pkg": "^6.11.0",
+		"esbuild": "^0.27.1",
+		"eslint": "^9.39.2",
 		"husky": "^9.1.7",
 		"jest": "^30.2.0",
 		"lint-staged": "^16.2.7",
+		"prettier": "^3.7.4",
 		"rimraf": "^6.1.2",
 		"ts-jest": "^29.4.6",
 		"tslib": "^2.8.1",
 		"tsx": "^4.21.0",
-		"typescript": "~4.9.5",
+		"typescript": "~5.9.3",
 		"zip-a-folder": "^4.0.4"
 	},
 	"packageManager": "yarn@4.12.0",
