@@ -1,4 +1,4 @@
-FROM node:18 AS builder
+FROM node:24 AS builder
   WORKDIR /usr/src/app
 
   COPY package.json yarn.lock .yarnrc.yml ./
@@ -6,15 +6,15 @@ FROM node:18 AS builder
   RUN corepack enable
 
   COPY ./src ./src
-  COPY tsconfig.build.json ./
+  COPY tsconfig.json ./
+  COPY ./tools ./tools
 
   RUN yarn install
-  RUN yarn build:ts
+  RUN UNPACKED=1 yarn build
 
-  RUN sed -i -e 's/^		"postinstall": "husky",$//' package.json
-  RUN yarn workspaces focus --production
+  RUN rm deploy/*.zip
 
-FROM node:18
+FROM node:24
   WORKDIR /usr/src/app
   ENV NODE_ENV=production
   ENV PATHS__FFMPEG=ffmpeg
@@ -24,9 +24,7 @@ FROM node:18
       apt-get install ffmpeg -y && \
       rm -rf /var/lib/apt/lists/*
 
-  COPY --from=builder /usr/src/app/package.json ./
-  COPY --from=builder /usr/src/app/dist ./dist
-  COPY --from=builder /usr/src/app/node_modules ./node_modules
-     
-  CMD [ "node", "dist" ]
+  COPY --from=builder /usr/src/app/deploy /usr/src/app
+
+  ENTRYPOINT [ "node", "scanner.js" ]
   HEALTHCHECK CMD curl -f http://localhost:8000/healthcheck || exit 1
