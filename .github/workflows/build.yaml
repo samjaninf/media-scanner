@@ -28,12 +28,7 @@ jobs:
           yarn install
         env:
           CI: true
-      - name: Run typecheck
-        run: |
-          yarn build:ts
-        env:
-          CI: true
-      - name: Run linter
+      - name: Run typecheck and linter
         run: |
           yarn lint
         env:

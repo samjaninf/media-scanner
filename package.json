@@ -20,11 +20,11 @@
 		"build-win32-x64": "run build win32 x64",
 		"build:docker": "docker build .",
 		"lint:raw": "run eslint --ext .ts --ext .js --ext .tsx --ext .jsx --ext .mts --ext .mjs --ignore-pattern dist",
-		"lint": "run lint:raw .",
+		"lint": "run check-types && run lint:raw .",
 		"lint-fix": "run lint --fix",
 		"unit": "node tools/fetch_ffmpeg.mjs && vitest",
 		"license-validate": "sofie-licensecheck",
-		"eslint": "./node_modules/.bin/eslint"
+		"check-types": "tsc --noEmit"
 	},
 	"engines": {
 		"node": ">=24.12",
