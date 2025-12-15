@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises'
 import { rimraf } from 'rimraf'
 import cp from 'child_process'
-import zipAFolder from 'zip-a-folder'
+import { zip } from 'zip-a-folder'
 import { mkdirp } from 'mkdirp'
 
 const platform = process.argv[2] || process.platform
@@ -36,7 +36,7 @@ const version = pkg.version
 const packageName = 'casparcg-scanner'
 const zipFileName = `${packageName}-v${version}-${platform}-${arch}.zip`
 
-const err = await zipAFolder.zip('./deploy', `./${zipFileName}`)
+const err = await zip('./deploy', `./${zipFileName}`)
 if (err) {
 	throw new Error(err)
 }
