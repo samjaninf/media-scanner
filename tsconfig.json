@@ -1,7 +1,21 @@
 {
-	"extends": "./tsconfig.build.json",
+	"extends": "@sofie-automation/code-standard-preset/ts/tsconfig.lib",
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules/**"],
 	"compilerOptions": {
-		"types": ["node", "jest"]
+		"outDir": "./dist",
+		"baseUrl": "./",
+		"paths": {
+			"*": ["./node_modules/*"],
+			"media-scanner": ["./src/index.ts"]
+		},
+		"types": ["node"],
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "es2022",
+		"module": "node20",
+		"moduleResolution": "node16",
+		"resolveJsonModule": true,
+		"noEmit": true
 	}
 }

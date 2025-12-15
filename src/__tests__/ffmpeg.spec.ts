@@ -3,6 +3,7 @@ import { PouchDBMediaDocument } from '../db.js'
 import path from 'path'
 import moment from 'moment'
 import { createRequire } from 'node:module'
+import { describe, test, expect } from 'vitest'
 
 const require = createRequire(import.meta.url)
 const targetVersions = require('./ffmpegReleases.json')
